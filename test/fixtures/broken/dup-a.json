@@ -1,0 +1,1 @@
+{ "schema_version": 1, "name": "X", "description": "d", "author": { "name": "A" }, "id": "dup-a", "repo": "https://github.com/a/Dup", "platform": "touch" }

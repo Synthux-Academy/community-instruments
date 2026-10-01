@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "xss",
+  "name": "<script>alert('name')</script>",
+  "description": "\"><img src=x onerror=alert(1)> & 'quotes'",
+  "author": { "name": "<b>Mallory</b> \"the\" 'author'", "url": "https://example.com/?a=1&b='x'" },
+  "repo": "https://github.com/mallory/xss",
+  "platform": "spotykach"
+}

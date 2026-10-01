@@ -1,0 +1,1 @@
+{ "schema_version": 1, "name": "X", "description": "d", "author": { "name": "A" }, "id": "unknown-platform", "repo": "https://github.com/a/unknown", "platform": "daisy" }

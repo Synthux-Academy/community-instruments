@@ -1,0 +1,55 @@
+# Optional (SPEC §6.3): weekly online check of every listed repo. Keeps a single
+# tracking issue (label "link-check") open while problems exist, closes it when clean.
+name: Link check
+
+on:
+  schedule:
+    - cron: '42 5 * * 1' # weekly, Monday 05:42 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Check all repos
+        id: check
+        continue-on-error: true
+        run: node scripts/validate.mjs --all --summary report.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Open, update or close tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Link check: listed projects need attention"
+          gh label create link-check --color d93f0b --description "Weekly link check" 2>/dev/null || true
+          issue=$(gh issue list --label link-check --state open --json number --jq '.[0].number // empty')
+          if [ -s report.md ]; then
+            {
+              echo "The weekly link check found problems with listed projects (errors and warnings, e.g. deleted, private or archived repos)."
+              echo "See the removal policy in CONTRIBUTING.md. Last run: $RUN_URL"
+              echo
+              cat report.md
+            } > body.md
+            if [ -n "$issue" ]; then
+              gh issue edit "$issue" --body-file body.md
+            else
+              gh issue create --title "$title" --label link-check --body-file body.md
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "All listed projects pass the link check ($RUN_URL)."
+          fi
+      - name: Fail if errors were found
+        if: steps.check.outcome == 'failure'
+        run: exit 1

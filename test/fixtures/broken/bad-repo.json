@@ -1,0 +1,1 @@
+{ "schema_version": 1, "name": "X", "description": "d", "author": { "name": "A" }, "id": "bad-repo", "repo": "https://github.com/a/repo.git", "platform": "touch" }

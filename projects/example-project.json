@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "example-project",
+  "name": "Simple Touch Instruments",
+  "description": "Example entry: instruments for the Simple Touch board. A maintainer will replace this with a real community project.",
+  "author": { "name": "Synthux Academy", "url": "https://www.synthux.academy" },
+  "repo": "https://github.com/Synthux-Academy/simple-touch-instruments",
+  "platform": "touch"
+}

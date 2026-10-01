@@ -1,0 +1,1 @@
+{ "schema_version": 1, "name": "X", "description": "d", "author": { "name": "A" }, "id": "extra-prop", "repo": "https://github.com/a/extra", "platform": "touch", "tags": [] }

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "future-fields",
+  "name": "Future Fields",
+  "description": "Uses the reserved firmware block.",
+  "author": { "name": "Someone" },
+  "repo": "https://github.com/someone/future-fields",
+  "platform": "audrey",
+  "firmware": { "asset_pattern": "*.bin", "hardware": ["rev2"], "min_bootloader": "v6.0" }
+}

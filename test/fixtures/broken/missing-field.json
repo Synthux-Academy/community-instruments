@@ -1,0 +1,1 @@
+{ "schema_version": 1, "id": "missing-field", "name": "X", "author": { "name": "A" }, "repo": "https://github.com/a/missing", "platform": "touch" }

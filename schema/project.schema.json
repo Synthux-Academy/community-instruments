@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Synthux-Academy/community-instruments/schema/project.schema.json",
+  "title": "Synthux community project entry",
+  "description": "One entry in the Synthux community projects directory. Lives at projects/<id>.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "name", "description", "author", "repo", "platform"],
+  "properties": {
+    "schema_version": {
+      "description": "Entry format version. Bumped only for breaking changes.",
+      "const": 1
+    },
+    "id": {
+      "description": "Unique slug. Must equal the filename without .json.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "description": "Display name.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "description": {
+      "description": "One-line description (no newlines).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\r\\n]*$"
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "url": {
+          "description": "Optional author homepage (https only).",
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      }
+    },
+    "repo": {
+      "description": "Public GitHub repository URL. No trailing slash, no .git, no subpaths.",
+      "type": "string",
+      "pattern": "^https://github\\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$",
+      "not": { "pattern": "\\.git$" }
+    },
+    "platform": {
+      "description": "The single Synthux platform this firmware targets.",
+      "enum": ["spotykach", "touch", "audrey"]
+    },
+    "firmware": {
+      "description": "RESERVED for future flashing support. Ignored by the site in schema_version 1.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "asset_pattern": {
+          "description": "Glob matched against release asset names, e.g. \"*.bin\".",
+          "type": "string",
+          "minLength": 1
+        },
+        "hardware": {
+          "description": "Hardware revision tags (free-form for now).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "min_bootloader": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
