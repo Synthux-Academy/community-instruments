@@ -100,7 +100,7 @@ footer { margin-top: 2rem; padding-bottom: 2rem; color: var(--muted); font-size:
 <body>
 <main>
 <h1>Community projects</h1>
-<p class="notice" role="note">These projects are created and maintained by community members. Synthux has not reviewed, tested, or endorsed them. Firmware can damage your device or your data; use it at your own risk and check each project's repository before installing.</p>
+<p class="notice" role="note">Everything here is made and looked after by people in the Synthux community. We love sharing their work, but we haven't reviewed or tested these projects ourselves. Before installing, have a look at each project's repository.</p>
 ${body}
 </main>
 <footer>

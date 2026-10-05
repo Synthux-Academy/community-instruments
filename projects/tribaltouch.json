@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tribaltouch",
+  "name": "TribalTouch",
+  "description": "TribalTouch turns the Synthux Touch 2 into a seven-voice generative percussion instrument. ",
+  "author": { "name": "ymillion", "url": "https://github.com/ymillion" },
+  "repo": "https://github.com/ymillion/tribaltouch-Touch2-Firmware",
+  "platform": "touch"
+}
