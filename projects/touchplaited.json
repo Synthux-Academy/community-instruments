@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "touchplaited",
+  "name": "TouchPlaited",
+  "description": "A Synthux Simple Touch firmware based on Mutable Instruments Plaits (Émilie Gillet, MIT License): a 7-voice touch synth plus a 16-step generative drum sequencer, playable at the same time.",
+  "author": { "name": "Jon Waterschoot", "url": "https://github.com/jonwaterschoot" },
+  "repo": "https://github.com/jonwaterschoot/TouchPlaited",
+  "platform": "touch"
+}
+

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "terrarium",
+  "name": "Terrarium",
+  "description": "Terrarium turns the Synthux Touch 2 into a self-evolving sound ecosystem. Each pad plants a sound organism.",
+  "author": { "name": "ymillion", "url": "https://github.com/ymillion" },
+  "repo": "https://github.com/ymillion/terrarium-Touch2-Firmware",
+  "platform": "touch"
+}
+
