@@ -11,7 +11,7 @@
     "validate": "node scripts/validate.mjs --offline",
     "validate:online": "node scripts/validate.mjs",
     "build": "node scripts/build-site.mjs",
-    "test": "node --test test/"
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
