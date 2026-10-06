@@ -32,6 +32,11 @@ test('real projects/ directory validates and builds', () => {
   rmSync(out, { recursive: true });
 });
 
+test('contributor template in templates/ stays valid', () => {
+  const res = run('validate.mjs', '--offline', '--dir', path.join(ROOT, 'templates'));
+  assert.equal(res.status, 0, res.stdout + res.stderr);
+});
+
 test('broken entries report every problem in one run', () => {
   const res = run('validate.mjs', '--offline', '--dir', fixture('broken'));
   assert.equal(res.status, 1);

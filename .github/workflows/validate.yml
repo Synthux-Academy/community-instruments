@@ -5,6 +5,7 @@ on:
     paths:
       - 'projects/**'
       - 'schema/**'
+      - 'templates/**'
       - 'scripts/**'
       - 'test/**'
       - 'package.json'

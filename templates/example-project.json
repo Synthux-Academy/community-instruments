@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "example-project",
+  "name": "Example Project",
+  "description": "A one-line description of what this firmware does.",
+  "author": { "name": "Jane Doe", "url": "https://example.com" },
+  "repo": "https://github.com/janedoe/example-project",
+  "platform": "touch"
+}
