@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "touchvink",
+  "name": "TouchVink",
+  "description": "A Jaap Vink style feedback instrument for the Synthux Simple Touch: a self-regulating delay, ring-mod and reverb loop that keeps itself moving, played from the pads.",
+  "author": { "name": "Jon Waterschoot", "url": "https://github.com/jonwaterschoot" },
+  "repo": "https://github.com/jonwaterschoot/TouchVink",
+  "platform": "touch"
+}
