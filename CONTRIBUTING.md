@@ -24,8 +24,8 @@ Recommended (not required yet):
 ## 3. How to add your project
 
 1. **Fork** this repository (button at the top right on GitHub).
-2. In your fork, copy [`projects/example-project.json`](projects/example-project.json) to `projects/<your-id>.json`. Pick an `id` such as `my-cool-synth`.
-3. Edit the fields (see the table below).
+2. In your fork, copy [`templates/example-project.json`](templates/example-project.json) to `projects/<your-id>.json`. Pick an `id` such as `my-cool-synth`.
+3. Edit the fields (see the table below), including `id` so it matches your new filename.
 4. **Open a pull request** to this repository. Fill in the checklist in the PR description.
 
 You can do all of this in the GitHub web interface: open the example file, copy its contents, then use "Add file → Create new file" in your fork.
@@ -70,7 +70,7 @@ Optional reserved block (ignored by the site today):
 }
 ```
 
-> **About `projects/example-project.json`:** it is a real entry pointing at a real Synthux repository, so the site always has something to show and the checks have something to run against. Maintainers will replace it once real community entries exist. Please don't edit it; add your own file instead.
+> **About `templates/example-project.json`:** it lives outside `projects/` so it never shows up in the directory. Please don't edit it; copy it into `projects/` under your own name instead.
 
 ## 4. What the automated checks do
 
