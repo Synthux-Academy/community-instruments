@@ -4,7 +4,7 @@ Thanks for sharing your work! This guide walks you through listing a project in 
 
 ## 1. What this is (and isn't)
 
-This repository is a **community directory**: a list of projects made by community members for Synthux platforms, with a link to each project's own GitHub repository.
+This repository is a **community directory**: a list of projects made by community members for Synthux platforms, with a link to each project's own repository on GitHub or Codeberg.
 
 - **Listing is not endorsement.** Synthux does not test, review, or audit the code or firmware of listed projects.
 - The directory only links to your repository. It does not host or mirror your files, and it does not flash firmware.
@@ -14,7 +14,7 @@ This repository is a **community directory**: a list of projects made by communi
 
 Your project needs:
 
-- A **public GitHub repository**.
+- A **public repository** on [GitHub](https://github.com) or [Codeberg](https://codeberg.org).
 - A **README** that explains what the project does and how to use it.
 
 Recommended (not required yet):
@@ -28,7 +28,7 @@ Recommended (not required yet):
 3. Edit the fields (see the table below), including `id` so it matches your new filename.
 4. **Open a pull request** to this repository. Fill in the checklist in the PR description.
 
-You can do all of this in the GitHub web interface: open the example file, copy its contents, then use "Add file → Create new file" in your fork.
+You can do all of this in the GitHub web interface: in your fork, use "Add file → Create new file". This directory lives on GitHub, so you need a GitHub account to open the pull request even if your project is on Codeberg.
 
 ### Field reference
 
@@ -40,7 +40,7 @@ You can do all of this in the GitHub web interface: open the example file, copy 
 | `description` | yes | One line, up to 200 characters. No line breaks. |
 | `author.name` | yes | Your name or handle, up to 80 characters. |
 | `author.url` | no | A link to your homepage or profile. Must start with `https://`. |
-| `repo` | yes | Your repository URL, exactly like `https://github.com/you/your-project`. No trailing `/`, no `.git`, no sub-paths. |
+| `repo` | yes | Your repository URL, exactly like `https://github.com/you/your-project` or `https://codeberg.org/you/your-project`. No trailing `/`, no `.git`, no sub-paths. Other hosts aren't supported yet. |
 | `platform` | yes | One of `spotykach`, `touch`, `audrey` (see [Platforms](#9-platforms)). |
 | `firmware` | no | **Reserved for future flashing support; ignored for now.** You may leave it out. |
 
@@ -78,11 +78,14 @@ When you open a pull request, a **Validate** check runs automatically. It verifi
 
 - your file is valid JSON and follows the format above (required fields, allowed values, no unknown fields);
 - the filename matches the `id`;
-- no other entry already lists the same repository for the same platform;
+- no other entry already lists the same repository for the same platform.
+
+During review, a maintainer also runs a **repository check** that looks at your repository on GitHub or Codeberg. It verifies that:
+
 - your repository exists and is **public**;
 - your repository has a **README**.
 
-It also gives warnings (which don't block your PR) if your repository is archived or has no releases yet. If GitHub can't be reached, you get a "could not verify" warning instead of a failure.
+It also gives warnings (which don't block your PR) if your repository is archived or has no releases yet. If GitHub or Codeberg can't be reached, the result is a "could not verify" warning instead of a failure. You don't need to do anything to start it; if it finds a problem, the reviewer will tell you in the PR.
 
 **Reading the results:** if the check fails, open the **Files changed** tab of your PR. Problems are shown as red annotations directly on your file, for example:
 

@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 // Validate every entry in projects/.
 //
-// Usage: node scripts/validate.mjs [--offline] [--all] [--dir <path>] [--summary <file>]
-//   --offline        skip GitHub API checks (also skipped when GITHUB_TOKEN is unset)
-//   --all            run online checks for every entry, not only changed ones
-//   --dir <path>     validate a different projects directory (used by tests)
-//   --summary <file> write a Markdown summary of all problems (used by link-check.yml)
+// Usage: node scripts/validate.mjs [--offline] [--all | --only <ids>] [--dir <path>] [--summary <file>]
+//   --offline        skip online repository checks
+//   --all            online-check every entry (default when --only is not given)
+//   --only <ids>     online-check only these comma-separated ids (at most MAX_ONLY)
+//   --dir <path>     validate a different projects directory (used by tests and check-repos.yml)
+//   --summary <file> write a Markdown summary of all problems (used by the workflows)
 //
-// Env: GITHUB_TOKEN enables online checks. BASE_REF (e.g. "main") limits online
-// checks to entries added/changed relative to origin/<BASE_REF>.
-import { execFileSync } from 'node:child_process';
+// Env: GITHUB_TOKEN is required to check github.com repos. CODEBERG_TOKEN is
+// optional for codeberg.org repos (anonymous access works, with lower limits).
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { PROJECTS_DIR, ROOT, displayPath, loadAndCheckProjects } from './lib.mjs';
+import { checkRepo } from './hosts.mjs';
+import { PROJECTS_DIR, displayPath, loadAndCheckProjects } from './lib.mjs';
+
+// Caps API traffic per manual PR check; a real contribution adds one or two files.
+const MAX_ONLY = 10;
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -22,22 +26,26 @@ const option = (name) => {
 };
 
 const offline = flag('--offline');
-const checkAll = flag('--all');
+const only = option('--only')?.split(',').map((s) => s.trim()).filter(Boolean);
 const dir = option('--dir') ? path.resolve(option('--dir')) : PROJECTS_DIR;
 const summaryFile = option('--summary');
-const token = process.env.GITHUB_TOKEN;
+const tokens = { GITHUB_TOKEN: process.env.GITHUB_TOKEN, CODEBERG_TOKEN: process.env.CODEBERG_TOKEN };
 const inActions = process.env.GITHUB_ACTIONS === 'true';
 
 const { projects, problems } = await loadAndCheckProjects(dir);
 
 if (offline) {
   console.log('Online checks skipped (--offline).');
-} else if (!token) {
-  console.log('Online checks skipped (GITHUB_TOKEN not set).');
+} else if (only && !flag('--all') && only.length > MAX_ONLY) {
+  problems.push({
+    file: dir,
+    severity: 'error',
+    message: `${only.length} entries changed; online checks are limited to ${MAX_ONLY} per run. Please split the pull request.`,
+  });
 } else {
-  const targets = checkAll ? projects : selectChanged(projects);
+  const targets = only && !flag('--all') ? projects.filter((p) => only.includes(p.data.id)) : projects;
   console.log(`Running online checks for ${targets.length} of ${projects.length} entr${projects.length === 1 ? 'y' : 'ies'}.`);
-  for (const p of targets) problems.push(...(await onlineChecks(p)));
+  for (const p of targets) problems.push(...(await checkRepo(p, { tokens })));
 }
 
 report(problems, projects.length);
@@ -45,76 +53,6 @@ if (summaryFile) await writeFile(summaryFile, markdownSummary(problems));
 process.exit(problems.some((p) => p.severity === 'error') ? 1 : 0);
 
 // ---------------------------------------------------------------------------
-
-/** Entries added or modified relative to the base ref; all entries if unknown. */
-function selectChanged(all) {
-  const baseRef = process.env.BASE_REF;
-  if (!baseRef) return all;
-  try {
-    const out = execFileSync(
-      'git',
-      ['diff', '--name-only', '--diff-filter=AMR', `origin/${baseRef}...HEAD`, '--', path.relative(ROOT, dir)],
-      { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
-    );
-    const changed = new Set(out.split('\n').filter(Boolean).map((f) => path.resolve(ROOT, f)));
-    return all.filter((p) => changed.has(p.file));
-  } catch (err) {
-    console.log(`Could not diff against origin/${baseRef} (${err.message.trim()}); checking all entries.`);
-    return all;
-  }
-}
-
-async function gh(apiPath) {
-  try {
-    const res = await fetch(`https://api.github.com${apiPath}`, {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'synthux-community-projects-validator',
-      },
-    });
-    const body = res.ok ? await res.json() : null;
-    return { status: res.status, body };
-  } catch (err) {
-    return { status: 0, body: null, networkError: err.message };
-  }
-}
-
-async function onlineChecks({ file, data }) {
-  const out = [];
-  const add = (severity, message) => out.push({ file, severity, message });
-  const couldNotVerify = (what, res) =>
-    add('warning', `could not verify ${what} for ${data.repo} (${res.networkError ?? `HTTP ${res.status}`}); will not fail the build`);
-
-  const [, owner, name] = new URL(data.repo).pathname.split('/');
-  const base = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}`;
-
-  const repo = await gh(base);
-  if (repo.status === 404) {
-    add('error', `/repo ${data.repo} does not exist or is not public`);
-    return out;
-  }
-  if (!repo.body) {
-    couldNotVerify('repository', repo);
-    return out;
-  }
-  if (repo.body.private) add('error', `/repo ${data.repo} is private; it must be public`);
-  if (repo.body.archived) add('warning', `/repo ${data.repo} is archived`);
-
-  const readme = await gh(`${base}/readme`);
-  if (readme.status === 404) add('error', `/repo ${data.repo} has no README`);
-  else if (!readme.body) couldNotVerify('README', readme);
-
-  const releases = await gh(`${base}/releases?per_page=1`);
-  if (releases.body) {
-    if (releases.body.length === 0) add('warning', `/repo ${data.repo} has no releases (future flashing support will need them)`);
-  } else {
-    couldNotVerify('releases', releases);
-  }
-
-  return out;
-}
 
 function escapeAnnotation(s, isProperty = false) {
   let r = String(s).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');

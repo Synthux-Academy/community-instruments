@@ -1,0 +1,62 @@
+# Manual repo check for a pull request, run by a reviewer from the Actions tab
+# ("Run workflow", enter the PR number). Checks that each changed entry's repo
+# exists, is public, has a README, and (warnings) isn't archived and has releases.
+#
+# Security: this runs with repository secrets, so it must never execute code from
+# the PR. It checks out the default branch and runs *its* scripts; the PR's
+# projects/*.json files are only read as data (scripts/pr-entries.mjs).
+name: Check repos (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-repos-${{ inputs.pr }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Collect the PR's entries
+        id: pr
+        run: node scripts/pr-entries.mjs "$PR" .pr-check/projects
+        env:
+          PR: ${{ inputs.pr }}
+      - name: Check repos
+        run: node scripts/validate.mjs --dir .pr-check/projects --only "$IDS" --summary report.md
+        env:
+          IDS: ${{ steps.pr.outputs.ids }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }} # optional
+      - name: Write job summary
+        if: always()
+        env:
+          PR: ${{ inputs.pr }}
+          PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ inputs.pr }}
+        run: |
+          {
+            echo "## Repo check for [PR #$PR]($PR_URL)"
+            echo
+            if [ ! -f report.md ]; then echo "The check did not complete; see the job log."
+            elif [ -s report.md ]; then cat report.md
+            else echo "No problems found."; fi
+          } >> "$GITHUB_STEP_SUMMARY"
