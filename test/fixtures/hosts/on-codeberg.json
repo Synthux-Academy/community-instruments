@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "on-codeberg",
+  "name": "On Codeberg",
+  "description": "Hosted on Codeberg; same owner/repo as on-github, which is a different repository.",
+  "author": { "name": "Someone", "url": "https://codeberg.org/someone" },
+  "repo": "https://codeberg.org/someone/same-name",
+  "platform": "touch"
+}

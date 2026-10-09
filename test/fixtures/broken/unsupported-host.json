@@ -1,0 +1,1 @@
+{ "schema_version": 1, "id": "unsupported-host", "name": "X", "description": "d", "author": { "name": "A" }, "repo": "https://gitlab.com/a/unsupported", "platform": "touch" }

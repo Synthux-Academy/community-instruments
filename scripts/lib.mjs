@@ -50,6 +50,7 @@ function formatAjvError(err) {
       return `${where} must be ${JSON.stringify(err.params.allowedValue)}`;
     case 'pattern':
       if (where === '/description') return `${where} must be a single line (no newlines)`;
+      if (where === '/repo') return `${where} must look like https://github.com/<owner>/<repo> or https://codeberg.org/<owner>/<repo> (no trailing slash or sub-paths)`;
       return `${where} must match pattern ${err.params.pattern}`;
     case 'not':
       if (where === '/repo') return `${where} must not end in ".git"`;

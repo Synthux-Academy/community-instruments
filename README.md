@@ -1,6 +1,6 @@
 # Synthux Community Projects
 
-A directory of community-made projects for Synthux platforms (Spotykach, Simple Touch, Audrey). Each project is one JSON file in [`projects/`](projects/). CI validates entries on every pull request, and a static page is published to GitHub Pages on every merge to `main`.
+A directory of community-made projects for Synthux platforms (Spotykach, Simple Touch, Audrey), hosted on GitHub or Codeberg. Each project is one JSON file in [`projects/`](projects/). CI validates entries on every pull request, and a static page is published to GitHub Pages on every merge to `main`.
 
 Listing is not endorsement: Synthux does not review or test listed projects.
 
@@ -17,19 +17,29 @@ Requires Node 20+.
 ```sh
 npm ci
 npm run validate          # offline checks (schema, filename/id, duplicates)
-npm run validate:online   # also checks repos via the GitHub API; needs GITHUB_TOKEN
+npm run validate:online   # also checks repos online: GitHub needs GITHUB_TOKEN, Codeberg works without CODEBERG_TOKEN
 npm run build             # writes dist/index.html, dist/projects.json, dist/.nojekyll
 npm test                  # unit tests, using fixtures in test/fixtures/
 open dist/index.html
 ```
 
-`validate.mjs` flags: `--offline` (skip GitHub API), `--all` (online-check every entry, not only changed ones), `--dir <path>` (validate another directory), `--summary <file>` (write a Markdown problem table).
+`validate.mjs` flags: `--offline` (skip online checks), `--only <id,id>` (online-check only these entries, max 10), `--all` (online-check every entry; the default without `--only`), `--dir <path>` (validate another directory), `--summary <file>` (write a Markdown problem table).
+
+To check a PR locally as a reviewer, stay on an up-to-date `main` (don't check out the PR: its scripts would run with your token) and run:
+
+```sh
+node scripts/pr-entries.mjs <pr-number> .pr-check/projects   # prints the changed ids
+GITHUB_TOKEN=$(gh auth token) node scripts/validate.mjs --dir .pr-check/projects --only <ids>
+```
 
 ## Deployment
 
-- [`validate.yml`](.github/workflows/validate.yml) runs on pull requests (read-only token, `pull_request` trigger). Online checks run only for entries changed in the PR, and the site build runs as a smoke test.
+- [`validate.yml`](.github/workflows/validate.yml) runs on pull requests (read-only token, `pull_request` trigger). It runs **offline checks only**, so pushing to a PR repeatedly can't use up API rate limits. It also runs the site build as a smoke test and the unit tests.
+- [`check-repos.yml`](.github/workflows/check-repos.yml) is run **manually by a reviewer** (Actions → "Check repos (manual)" → Run workflow → PR number). It checks the repos of the entries the PR changes, at most 10 per run, and writes the result to the job summary. It runs `main`'s scripts and reads the PR's JSON files only as data, so it is safe to use repository secrets.
 - [`pages.yml`](.github/workflows/pages.yml) runs on push to `main`, weekly, and on demand. It validates offline (refusing to publish invalid data), builds `dist/`, and deploys with `actions/deploy-pages`.
 - [`link-check.yml`](.github/workflows/link-check.yml) (optional) checks every listed repo weekly and keeps one tracking issue labelled `link-check` up to date.
+
+**Secrets:** `GITHUB_TOKEN` is provided automatically. `CODEBERG_TOKEN` is optional (a read-only Codeberg token, ideally from a bot account). Without it, Codeberg is queried anonymously.
 
 **Setup:** in the repository settings, go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
 

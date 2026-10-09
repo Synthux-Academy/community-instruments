@@ -27,6 +27,7 @@ jobs:
         run: node scripts/validate.mjs --all --summary report.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }} # optional
       - name: Open, update or close tracking issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

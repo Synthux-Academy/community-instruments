@@ -10,7 +10,7 @@ import { escapeHtml } from '../scripts/lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixture = (name) => path.join(ROOT, 'test', 'fixtures', name);
-const env = { ...process.env, GITHUB_TOKEN: '', GITHUB_ACTIONS: '' };
+const env = { ...process.env, GITHUB_TOKEN: '', CODEBERG_TOKEN: '', GITHUB_ACTIONS: '' };
 
 function run(script, ...args) {
   return spawnSync(process.execPath, [path.join(ROOT, 'scripts', script), ...args], { cwd: ROOT, env, encoding: 'utf8' });
@@ -50,6 +50,7 @@ test('broken entries report every problem in one run', () => {
     /notes\.txt: only \*\.json files are allowed/,
     /unknown-platform\.json: \/platform must be one of/,
     /dup-b\.json: \/repo .* is already listed for platform "touch"/,
+    /unsupported-host\.json: \/repo must look like https:\/\/github\.com/,
   ];
   for (const re of expected) assert.match(res.stderr, re);
   // Same repo on a different platform is allowed.
@@ -104,3 +105,15 @@ test('escapeHtml escapes all special characters', () => {
   assert.equal(escapeHtml(`<a href="x">'&'</a>`), '&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;');
 });
 
+
+test('GitHub and Codeberg repos are both accepted, and do not collide as duplicates', () => {
+  const res = run('validate.mjs', '--offline', '--dir', fixture('hosts'));
+  assert.equal(res.status, 0, res.stderr);
+});
+
+test('--only is capped to keep manual PR checks cheap', () => {
+  const ids = Array.from({ length: 11 }, (_, i) => `id-${i}`).join(',');
+  const res = run('validate.mjs', '--dir', fixture('hosts'), '--only', ids);
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /11 entries changed; online checks are limited to 10/);
+});
