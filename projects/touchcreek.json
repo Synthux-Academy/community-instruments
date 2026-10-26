@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "touchcreek",
+  "name": "TouchCreek",
+  "description": "A sample-free procedural creek synthesizer for the Synthux Simple Touch: from a trickle to a lively stream, playable in tune from the pads or via MIDI.",
+  "author": { "name": "Petr Vlk", "url": "https://creek.imagiag.com" },
+  "repo": "https://github.com/imagiag/TouchCreek",
+  "platform": "touch"
+}
