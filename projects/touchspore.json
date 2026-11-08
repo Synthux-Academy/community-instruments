@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "touchspore",
+  "name": "TouchSpore",
+  "description": "Generative plinks and pads for the Synthux Simple Touch. Pad touches, hand distance and the noise from plants or wires drive the notes.",
+  "author": { "name": "Jon Waterschoot", "url": "https://github.com/jonwaterschoot" },
+  "repo": "https://github.com/jonwaterschoot/TouchSpore",
+  "platform": "touch"
+}
